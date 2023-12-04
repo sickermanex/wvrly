@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import axios from "axios";
-import { getAllUsersData, saveUserData } from "../store/userData.slice";
+import { getAllUsersData, saveUserData, searchUserData } from "../store/userData.slice";
 
 
 const url = "http://localhost:3000";
@@ -31,21 +31,21 @@ export const useCreateUser = () => {
   }, []);
 
   return { saveUser };
-  useEffect(() => {
-  }, [dispatch]);
 };
 
-export const useSearchUser = (dispatch, searchCriteria) => {
-  useEffect(() => {
-    const searchData = async () => {
-      const { lat, long, radio } = searchCriteria;
-      try {
-        const response = await axios.get(
-          `${url}/data?lat=${lat}&long=${long}&radio=${radio}`
-        );
-      } catch (error) {
-      }
-    };
-    searchData();
-  }, [dispatch]);
+export const useSearchUser = () => {
+  const fetchUsers = useCallback(async (dispatch, searchCriteria) => {
+    const { lat, lon, radio } = searchCriteria;
+    try {
+      const { data } = await axios.get(
+        `${url}/search-by-radio?lat=${lat}&lon=${lon}&radio=${radio}`
+      );
+      console.log(data)
+      dispatch(searchUserData(data))
+      return data;
+    } catch (error) {
+    }
+  }, []);
+
+  return { fetchUsers }
 };

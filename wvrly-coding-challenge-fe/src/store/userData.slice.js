@@ -18,7 +18,7 @@ export const usersDataSlice = createSlice({
       state.users = action.payload;
     },
     searchUserData: (state, action) => {
-      state.users = action.payload;
+      state.users.data = action.payload;
     },
   },
 })
