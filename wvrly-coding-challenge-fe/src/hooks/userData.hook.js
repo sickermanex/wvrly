@@ -1,66 +1,50 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import axios from "axios";
-import { getAllUsersData } from "../store/userData.slice";
+import { getAllUsersData, saveUserData } from "../store/userData.slice";
 
 const url = "http://localhost:3000";
 
-export const useFetchAllUsers = () => {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-
+export const useFetchAllUsers = (dispatch) => {
   useEffect(() => {
     (async () => {
       try {
-        setLoading(true);
-        const response = await axios.get(url);
-        setData(response);
-        getAllUsersData(response)
+        const { data } = await axios.get(url);
+        dispatch(getAllUsersData(data))
       } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
+        dispatch(getAllUsersData({ data: [], error }))
       }
     })();
-  }, []);
-
-  return { data, error, loading };
+  }, [dispatch]);
 };
 
-export const useCreateUser = (data) => {
-  useEffect(() => {
-    (async () => {
+export const useCreateUser = () => {
+  const saveUser = useCallback(async (dispatch, data) => {
       try {
-        setLoading(true);
         const response = await axios.post(url, data);
-        setData(response.data);
+        dispatch(saveUserData(response.data))
+        useFetchAllUsers(dispatch);
+        return response.data;
       } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
+        // dispatch(saveUserData({ data: [], error }))
       }
-    })();
   }, []);
-  return { data, error, loading };
+
+  return { saveUser };
+  useEffect(() => {
+  }, [dispatch]);
 };
 
-export const useSearchUser = (searchCriteria) => {
+export const useSearchUser = (dispatch, searchCriteria) => {
   useEffect(() => {
     const searchData = async () => {
       const { lat, long, radio } = searchCriteria;
       try {
-        setLoading(true);
         const response = await axios.get(
           `${url}/data?lat=${lat}&long=${long}&radio=${radio}`
         );
-        setData(response.data);
       } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
       }
     };
     searchData();
-  }, []);
-  return { data, error, loading };
+  }, [dispatch]);
 };

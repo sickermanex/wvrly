@@ -1,64 +1,90 @@
-import React, { useEffect } from "react";
-import { useFetchAllUsers } from "../../hooks/userData.hook";
+import React, { useEffect, useState } from "react";
+import { useCreateUser, useFetchAllUsers } from "../../hooks/userData.hook";
 import { useFormik } from "formik";
 import { useSelector, useDispatch } from "react-redux";
 
 import "./UserForm.css";
-import { getAllUsersData } from "../../store/userData.slice";
+import MapView from "../MapView/MapView";
 
 const UserForm = () => {
-  const dispatch = useDispatch();
+  let dispatch = useDispatch();
+  const { saveUser } = useCreateUser();
 
-  const response = useFetchAllUsers();
-
-  const formik = useFormik({
-    initialValues: {
-      name: "",
-      lastname: "",
-      email: "",
-      phone: "",
-      longitude: -66.15,
-      latitute: -17.3,
-    },
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-    },
+  useFetchAllUsers(dispatch);
+  
+  const { data, error } = useSelector(state => state.usersData.users)
+  const [userState, setUserState] = useState({
+    name: "",
+    lastname: "",
+    email: "",
+    phone: "",
+    lon: 0,
+    lat: 0,
   });
 
-  return (
-    <form onSubmit={formik.handleSubmit} className="user_data_form">
-      <label>Insert User Data</label>
-      <input
-        type="text"
-        id="name"
-        name="name"
-        onChange={formik.handleChange}
-        value={formik.values.name}
-      />
-      <input
-        type="text"
-        id="lastname"
-        name="lastname"
-        onChange={formik.handleChange}
-        value={formik.values.lastname}
-      />
-      <input
-        type="text"
-        id="email"
-        name="email"
-        onChange={formik.handleChange}
-        value={formik.values.email}
-      />
-      <input
-        type="text"
-        id="phone"
-        name="phone"
-        onChange={formik.handleChange}
-        value={formik.values.phone}
-      />
+  const formik = useFormik({
+    initialValues: userState,
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        values.lat = userState.lat;
+        values.lon = userState.lon
+        await saveUser(dispatch, values);
+  
+        resetForm();
+        window.location.reload();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  });
 
-      <button type="submit">Submit</button>
-    </form>
+
+  const getNewCoords = (lon, lat) => {
+    userState.lat = lat;
+    userState.lon = lon;
+    setUserState(userState);
+  }
+
+  return (
+    <>
+      <form onSubmit={formik.handleSubmit} className="user_data_form">
+        <label>Insert User Data</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          onChange={formik.handleChange}
+          value={formik.values.name}
+        />
+        <input
+          type="text"
+          id="lastname"
+          name="lastname"
+          onChange={formik.handleChange}
+          value={formik.values.lastname}
+        />
+        <input
+          type="text"
+          id="email"
+          name="email"
+          onChange={formik.handleChange}
+          value={formik.values.email}
+        />
+        <input
+          type="text"
+          id="phone"
+          name="phone"
+          onChange={formik.handleChange}
+          value={formik.values.phone}
+        />
+
+        <input type="hidden" id="lat" name="lat" onChange={formik.handleChange} value={formik.values.lat} />
+        <input type="hidden" id="lon" name="lon" onChange={formik.handleChange} value={formik.values.lon} />
+
+        <button type="submit">Submit</button>
+        <MapView data={data} updateCoords={getNewCoords}/>
+      </form>
+    </>
   );
 };
 

@@ -3,8 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
   users: {
     data: [],
-    error: null,
-    loading: false
+    error: null
   }
 }
 
@@ -12,14 +11,13 @@ export const usersDataSlice = createSlice({
   name: 'usersData',
   initialState,
   reducers: {
-    getAllUsersData: async (state, action) => {
-      console.log(action.payload)
-      state.users = action.payload
+    getAllUsersData: (state, action) => {
+      state.users.data = action.payload
     },
-    saveUserData: async (state, action) => {
+    saveUserData: (state, action) => {
       state.users = action.payload;
     },
-    searchUserData: async (state, action) => {
+    searchUserData: (state, action) => {
       state.users = action.payload;
     },
   },
