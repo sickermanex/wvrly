@@ -2,6 +2,7 @@ import { useCallback, useEffect } from "react";
 import axios from "axios";
 import { getAllUsersData, saveUserData } from "../store/userData.slice";
 
+
 const url = "http://localhost:3000";
 
 export const useFetchAllUsers = (dispatch) => {
@@ -22,8 +23,8 @@ export const useCreateUser = () => {
       try {
         const response = await axios.post(url, data);
         dispatch(saveUserData(response.data))
-        useFetchAllUsers(dispatch);
-        return response.data;
+        // useFetchAllUsers(newDispatch);
+        return true;
       } catch (error) {
         // dispatch(saveUserData({ data: [], error }))
       }

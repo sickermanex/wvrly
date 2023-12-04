@@ -15,3 +15,34 @@
   margin: 12px;
   border-radius: 4px;
 }
+
+.marker-button {
+  background-color: #4285f4; 
+  color: #ffffff; 
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.marker-button.insert {
+  background-color: tomato;
+}
+
+.marker-button.insert:hover {
+  background-color: coral;
+}
+
+.marker-button.insert:active {
+  background-color: tomato;
+}
+
+.marker-button:hover {
+  background-color: #3873cc;
+}
+
+.marker-button:active {
+  background-color: #2f5eaa;
+}

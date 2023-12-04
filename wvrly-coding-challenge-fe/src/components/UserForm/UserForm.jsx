@@ -28,10 +28,9 @@ const UserForm = () => {
       try {
         values.lat = userState.lat;
         values.lon = userState.lon
-        await saveUser(dispatch, values);
-  
+        const isSuccess = await saveUser(dispatch, values);
         resetForm();
-        window.location.reload();
+        // window.location.reload();
       } catch (error) {
         console.error(error);
       }
@@ -39,7 +38,7 @@ const UserForm = () => {
   });
 
 
-  const getNewCoords = (lon, lat) => {
+  const updateCoords = (lon, lat) => {
     userState.lat = lat;
     userState.lon = lon;
     setUserState(userState);
@@ -82,7 +81,7 @@ const UserForm = () => {
         <input type="hidden" id="lon" name="lon" onChange={formik.handleChange} value={formik.values.lon} />
 
         <button type="submit">Submit</button>
-        <MapView data={data} updateCoords={getNewCoords}/>
+        <MapView data={data} updateCoords={updateCoords}/>
       </form>
     </>
   );

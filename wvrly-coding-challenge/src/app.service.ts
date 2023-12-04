@@ -47,9 +47,6 @@ export class AppService {
     // const user = await this.usersRepository.create(userData)
     const user = await this.usersRepository.query(sql);
 
-    console.log(user);
-    
-
     return await this.usersRepository.findOneBy(user);
   }
 

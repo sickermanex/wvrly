@@ -7,9 +7,9 @@ import { useSelector, useDispatch } from "react-redux";
  
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2lja2VybWFuZXgiLCJhIjoiY2xwcHFkejNsMTJhYzJxbzlmNHo1d2dheiJ9.9agQ6MKCoRK8k-3DRvEFWA';
 
-const Marker = () => {
+const Marker = (props) => {
   return(
-    <button className='marker'>OLA K ASE</button>
+    <button className={props.class || 'marker-button'}></button>
   )
 }
 
@@ -22,6 +22,20 @@ const MapView = (props) => {
   const [zoom, setZoom] = useState(0);
   const dataRef = useRef(props.data);
   dataRef.current = props.data;
+
+  const createMarker = (coords, isForInsert=false) => {
+    const { lat, lon } = coords;
+    const ref = React.createRef();
+    const className = isForInsert ? 'marker-button insert' : null;
+    ref.current = document.createElement('div');
+    createRoot(ref.current).render(
+      <Marker class={className}/>
+    );
+
+    new mapboxgl.Marker(ref.current)
+      .setLngLat([lon, lat])
+      .addTo(map.current);
+  }
   
   useEffect(() => {
     if (map.current) return;
@@ -35,25 +49,16 @@ const MapView = (props) => {
 
     map.current.on('load', () => {
       dataRef.current.forEach((coord) => {
-        const { lat, lon } = coord;
-        const ref = React.createRef();
-        ref.current = document.createElement('div');
-        createRoot(ref.current).render(
-          <Marker />
-        );
-
-        new mapboxgl.Marker(ref.current)
-          .setLngLat([lon, lat])
-          .addTo(map.current);
+        createMarker(coord);
       });
     });
 
     map.current.on('dblclick', (e) => {
-      console.log(e.lngLat.lng, e.lngLat.lat)
       const {lng, lat} = e.lngLat;
       props.updateCoords(lng, lat);
       // setClickCoords([e.lngLat.lng, e.lngLat.lat]);
       // setIsModalOpen(true);
+      createMarker({ lon: lng, lat }, true)
     });
 
     map.current.on('move', () => {
