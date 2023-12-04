@@ -1,0 +1,10 @@
+.user_data_form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-content: center;
+}
+
+.user_data_form input {
+  margin: 10px 0;
+}
