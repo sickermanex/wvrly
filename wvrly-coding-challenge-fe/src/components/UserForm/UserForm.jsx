@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useCreateUser, useFetchAllUsers, useSearchUser } from "../../hooks/userData.hook";
 import { useFormik } from "formik";
 import { useSelector, useDispatch } from "react-redux";
+import MapView from "../MapView/MapView";
 
 import "./UserForm.css";
-import MapView from "../MapView/MapView";
-import { searchUserData } from "../../store/slices/userData.slice";
 
 const UserForm = () => {
   let dispatch = useDispatch();
@@ -49,20 +48,41 @@ const UserForm = () => {
         }
       } else {
         try {
-          console.log(values)
           const newData = await fetchUsers(dispatch, values)
         } catch (error) {
           console.error(error);
         }
       }
-    }
+    },
+    validate: (values) => {
+      const errors = {};
+
+      if (isCreate) {
+        if (values.name == "") {
+          errors.name = 'Name is required';
+        }
+
+        if (values.lastname == "") {
+          errors.lastname = 'Lastname is required';
+        }
+      } 
+
+      if (values.lat === 0 || values.lon === 0) {
+        errors.lat = 'Latitude and Longitude are required';
+        errors.lon = 'Latitude and Longitude are required';
+      }
+
+      return errors;
+    },
   });
 
 
   const updateCoords = (lon, lat) => {
     userState.lat = lat;
-    userState.lon = lon;
+    userState.lon = lon
     setUserState(userState);
+    formik.setFieldValue('lat', lat)
+    formik.setFieldValue('lon', lon)
   }
 
   const clearFilters = (e) => {
@@ -73,8 +93,8 @@ const UserForm = () => {
   return (
     <>
       <div className="buttons-container">
-        <button onClick={() => updateIsCreate(true)}>Create new user</button>
-        <button onClick={() => updateIsCreate(false)}>Search users</button>
+        <button onClick={() => { formik.resetForm(); updateIsCreate(true)}}>Create new user</button>
+        <button onClick={() => { formik.resetForm() ; updateIsCreate(false)}}>Search users</button>
       </div>
       <form onSubmit={formik.handleSubmit} className="user_data_form">
         <div className="input-container">
@@ -89,6 +109,9 @@ const UserForm = () => {
                 onChange={formik.handleChange}
                 value={formik.values.name}
               />
+               { formik.touched.name && formik.errors.name ? (
+                <div className="error-message">{formik.errors.name}</div>
+              ) : null}
               </div>
               <div>
                 <label>Lastname </label>
@@ -99,6 +122,9 @@ const UserForm = () => {
                   onChange={formik.handleChange}
                   value={formik.values.lastname}
                 />
+                { formik.touched.lastname && formik.errors.lastname ? (
+                <div className="error-message">{formik.errors.lastname}</div>
+              ) : null}
               </div>
               <div>
                 <label>Email </label>
@@ -124,7 +150,7 @@ const UserForm = () => {
           ) : (
               <>
                 <div className="input-entry">
-                  <label>Radio (Km.) {formik.values.radio}</label>
+                  <label>Radio units {formik.values.radio}</label>
                   <input type="range"
                     id="radio"
                     name="radio"
@@ -143,10 +169,13 @@ const UserForm = () => {
           )}
         </div>
 
-        <input type="hidden" id="lat" name="lat" onChange={formik.handleChange} value={formik.values.lat} />
-        <input type="hidden" id="lon" name="lon" onChange={formik.handleChange} value={formik.values.lon} />
+        <input type="hidden" id="lat" name="lat" value={formik.values.lat} />
+        <input type="hidden" id="lon" name="lon" value={formik.values.lon} />
+        { (formik.touched.lat && formik.errors.lat) || (formik.touched.lon && formik.errors.lon) ? (
+            <div className="error-message">{formik.errors.lat}</div>
+          ) : null}
 
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={!formik.isValid}>Submit</button>
         { !isCreate ? 
         (<>
           <button onClick={clearFilters} type="button">Clear Search</button>

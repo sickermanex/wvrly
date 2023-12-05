@@ -27,3 +27,10 @@
 .info-data {
   margin: 10px 0;
 }
+
+.error-message {
+  margin: -5px 0 10px 0;
+    color: red;
+    background: black;
+    font-size: 13px;
+}
