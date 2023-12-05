@@ -5,17 +5,14 @@ import { useSelector, useDispatch } from "react-redux";
 
 import "./UserForm.css";
 import MapView from "../MapView/MapView";
-import { searchUserData } from "../../store/userData.slice";
+import { searchUserData } from "../../store/slices/userData.slice";
 
 const UserForm = () => {
   let dispatch = useDispatch();
   const { saveUser } = useCreateUser();
   const { fetchUsers } = useSearchUser();
   const { fetchAllUsers } = useFetchAllUsers();
-  
-  const { data, error } = useSelector(state => state.usersData.users)
-  const [isCreate, setIsCreate] = useState(true);
-  const [userState, setUserState] = useState({
+  const blankUserState = {
     name: "",
     lastname: "",
     email: "",
@@ -23,7 +20,11 @@ const UserForm = () => {
     lon: 0,
     lat: 0,
     radio: 0,
-  });
+  }
+  
+  const { data, error } = useSelector(state => state.usersData.users)
+  const [isCreate, setIsCreate] = useState(true);
+  const [userState, setUserState] = useState(blankUserState);
 
   useEffect(() => {
     fetchAllUsers(dispatch);
@@ -42,7 +43,7 @@ const UserForm = () => {
         try {
           const isSuccess = await saveUser(dispatch, values);
           resetForm();
-          window.location.reload();
+          setUserState(blankUserState);
         } catch (error) {
           console.error(error);
         }
@@ -112,7 +113,7 @@ const UserForm = () => {
               <div>
                 <label>Phone </label>
                 <input
-                  type="number"
+                  type="phone"
                   id="phone"
                   name="phone"
                   onChange={formik.handleChange}

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { AppService } from './app.service';
-import { UserDataEntity } from './db/entities/user_data.entity';
+import { AppService } from '../services/app.service';
+import { UserDataEntity } from '../db/entities/user_data.entity';
 
 @Controller()
 export class AppController {

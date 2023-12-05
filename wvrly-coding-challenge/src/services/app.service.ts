@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UserDataEntity } from './db/entities/user_data.entity';
+import { UserDataEntity } from '../db/entities/user_data.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { log } from 'console';
 
 @Injectable()
 export class AppService {
@@ -44,7 +43,6 @@ export class AppService {
       RETURNING id
     `;
     
-    // const user = await this.usersRepository.create(userData)
     const user = await this.usersRepository.query(sql);
 
     return await this.usersRepository.findOneBy(user);

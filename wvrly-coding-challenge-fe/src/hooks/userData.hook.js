@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import axios from "axios";
-import { getAllUsersData, saveUserData, searchUserData } from "../store/userData.slice";
+import { getAllUsersData, saveUserData, searchUserData } from "../store/slices/userData.slice";
 
 
 const url = "http://localhost:3000";
@@ -23,10 +23,9 @@ export const useCreateUser = () => {
       try {
         const response = await axios.post(url, data);
         dispatch(saveUserData(response.data))
-        // useFetchAllUsers(newDispatch);
         return true;
       } catch (error) {
-        // dispatch(saveUserData({ data: [], error }))
+        dispatch(saveUserData({ data: [], error }))
       }
   }, []);
 

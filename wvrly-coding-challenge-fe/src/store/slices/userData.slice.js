@@ -15,7 +15,7 @@ export const usersDataSlice = createSlice({
       state.users.data = action.payload
     },
     saveUserData: (state, action) => {
-      state.users = action.payload;
+      state.users.data.push(action.payload);
     },
     searchUserData: (state, action) => {
       state.users.data = action.payload;
@@ -23,7 +23,7 @@ export const usersDataSlice = createSlice({
   },
 })
 
-// Action creators are generated for each case reducer function
+
 export const { 
   getAllUsersData,
   saveUserData,

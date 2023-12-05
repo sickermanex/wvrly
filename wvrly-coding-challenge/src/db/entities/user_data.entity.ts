@@ -12,7 +12,7 @@ export class UserDataEntity {
   lon: number;
   
   @Column({ type: 'geometry', name: 'geom_point', srid: 4236, nullable: true })
-  geomPoint?: number;
+  geomPoint?: object;
 
   @Column()
   name: string;
