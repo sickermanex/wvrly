@@ -2,7 +2,6 @@ import { useCallback, useEffect } from "react";
 import axios from "axios";
 import { getAllUsersData, saveUserData, searchUserData } from "../store/slices/userData.slice";
 
-
 const url = "http://localhost:3000";
 
 export const useFetchAllUsers = () => {
