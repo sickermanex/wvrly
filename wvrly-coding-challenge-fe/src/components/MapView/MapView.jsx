@@ -9,10 +9,9 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoic2lja2VybWFuZXgiLCJhIjoiY2xwcHFkejNsMTJhYzJxb
 
 const Marker = (props) => {
   return(
-    <button className={props.class || 'marker-button'}></button>
+    <button disabled className={props.class || 'marker-button'}></button>
   )
 }
-
 
 const MapView = (props) => {
   const mapContainer = useRef(null);
@@ -20,6 +19,7 @@ const MapView = (props) => {
   const [lng, setLng] = useState(-66.1550592);
   const [lat, setLat] = useState(-17.3731255);
   const [zoom, setZoom] = useState(0);
+  const [marker, setMarker] = useState(null);
   const dataRef = useRef(props.data);
   dataRef.current = props.data;
 
@@ -27,19 +27,25 @@ const MapView = (props) => {
     const { lat, lon } = coords;
     const ref = React.createRef();
     const className = isForInsert ? 'marker-button insert' : null;
+
     ref.current = document.createElement('div');
+
     createRoot(ref.current).render(
       <Marker class={className}/>
     );
-
-    new mapboxgl.Marker(ref.current)
+    
+   const newMarker = new mapboxgl.Marker(ref.current)
       .setLngLat([lon, lat])
-      .addTo(map.current);
+      .addTo(map.current)
+
+    if (isForInsert) {
+      // Guardar el nuevo marcador en el estado solo si es para inserción
+      setMarker(newMarker);
+      console.log('for insert', marker)
+    }
   }
   
-  useEffect(() => {
-    if (map.current) return;
-    
+  useEffect(() => {    
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
@@ -53,12 +59,11 @@ const MapView = (props) => {
       });
     });
 
-    map.current.on('dblclick', (e) => {
+    map.current.on('click', (e) => {
       const {lng, lat} = e.lngLat;
       props.updateCoords(lng, lat);
-      // setClickCoords([e.lngLat.lng, e.lngLat.lat]);
-      // setIsModalOpen(true);
       createMarker({ lon: lng, lat }, true)
+      map.current.triggerRepaint()
     });
 
     map.current.on('move', () => {
@@ -66,13 +71,15 @@ const MapView = (props) => {
       setLat(map.current.getCenter().lat.toFixed(4));
       setZoom(map.current.getZoom().toFixed(2));
     });
+
+    return () => {
+      map.current.remove();
+    };
+
   }, [props.data]);
 
   return (
     <div>
-      <div className="sidebar">
-        Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-      </div>
       <div ref={mapContainer} className="map-container" />
     </div>
   );

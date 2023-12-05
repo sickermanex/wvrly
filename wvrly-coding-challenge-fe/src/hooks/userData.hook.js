@@ -5,17 +5,17 @@ import { getAllUsersData, saveUserData, searchUserData } from "../store/userData
 
 const url = "http://localhost:3000";
 
-export const useFetchAllUsers = (dispatch) => {
-  useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await axios.get(url);
-        dispatch(getAllUsersData(data))
-      } catch (error) {
-        dispatch(getAllUsersData({ data: [], error }))
-      }
-    })();
-  }, [dispatch]);
+export const useFetchAllUsers = () => {
+  const fetchAllUsers = useCallback(async (dispatch) => {
+    try {
+      const { data } = await axios.get(url);
+      dispatch(getAllUsersData(data))
+    } catch (error) {
+      dispatch(getAllUsersData({ data: [], error }))
+    }
+  }, []);
+  
+  return { fetchAllUsers };
 };
 
 export const useCreateUser = () => {

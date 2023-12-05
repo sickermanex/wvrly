@@ -11,12 +11,10 @@ const UserForm = () => {
   let dispatch = useDispatch();
   const { saveUser } = useCreateUser();
   const { fetchUsers } = useSearchUser();
-
-  useFetchAllUsers(dispatch);
+  const { fetchAllUsers } = useFetchAllUsers();
   
   const { data, error } = useSelector(state => state.usersData.users)
   const [isCreate, setIsCreate] = useState(true);
-  const [mapData, setMapData] = useState(data);
   const [userState, setUserState] = useState({
     name: "",
     lastname: "",
@@ -26,6 +24,10 @@ const UserForm = () => {
     lat: 0,
     radio: 0,
   });
+
+  useEffect(() => {
+    fetchAllUsers(dispatch);
+  }, [])
 
   const updateIsCreate = (status) => {
     setIsCreate(status);
@@ -48,7 +50,6 @@ const UserForm = () => {
         try {
           console.log(values)
           const newData = await fetchUsers(dispatch, values)
-          setMapData(newData);
         } catch (error) {
           console.error(error);
         }
@@ -61,6 +62,11 @@ const UserForm = () => {
     userState.lat = lat;
     userState.lon = lon;
     setUserState(userState);
+  }
+
+  const clearFilters = (e) => {
+    e.preventDefault();
+    fetchAllUsers(dispatch);
   }
 
   return (
@@ -116,20 +122,21 @@ const UserForm = () => {
             </>
           ) : (
               <>
-                <div>
-                  <label>Radio {formik.values.radio}</label>
+                <div className="input-entry">
+                  <label>Radio (Km.) {formik.values.radio}</label>
                   <input type="range"
                     id="radio"
                     name="radio"
                     min={0}
                     max={350}
+                    step={5}
                     onChange={formik.handleChange}
                     value={formik.values.radio}
                   />
                 </div>
-                <div>
-                  <label>Latitude: {userState.lat}</label><br/>
-                  <label>Longitude: {userState.lon}</label>
+                <div className="input-entry">
+                  <label className="info-data">Latitude: {userState.lat}</label><br/>
+                  <label className="info-data">Longitude: {userState.lon}</label>
                 </div>
               </>
           )}
@@ -139,7 +146,13 @@ const UserForm = () => {
         <input type="hidden" id="lon" name="lon" onChange={formik.handleChange} value={formik.values.lon} />
 
         <button type="submit">Submit</button>
-        <MapView data={data} updateCoords={updateCoords}/>
+        { !isCreate ? 
+        (<>
+          <button onClick={clearFilters} type="button">Clear Search</button>
+        </>) : null }
+        <div className="map-container">
+          <MapView data={data} updateCoords={updateCoords}/>
+        </div>
       </form>
     </>
   );
